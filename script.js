@@ -5,7 +5,7 @@ async function encurtar() {
     const linkCurto = document.getElementById('shortUrl');
 
     if (!urlOriginal) {
-        alert("Manuel, por favor cole uma URL válida!");
+        alert("Cole uma URL válida!");
         return;
     }
 
@@ -14,7 +14,7 @@ async function encurtar() {
     btn.disabled = true;
 
     try {
-        // Chamada para a API do Cleanuri (exemplo de API gratuita)
+        // Chamada para a API do Cleanuri
         const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlOriginal)}`);
         
         if (response.ok) {
@@ -38,5 +38,5 @@ async function encurtar() {
 function copiar() {
     const text = document.getElementById('shortUrl').innerText;
     navigator.clipboard.writeText(text);
-    alert("Link copiado para a área de transferência, Manuel!");
+    alert("Link copiado para a área de transferência!");
 }
