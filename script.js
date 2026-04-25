@@ -1,42 +1,52 @@
-async function encurtar() {
-    const urlOriginal = document.getElementById('inputUrl').value;
-    const btn = document.getElementById('btnEncurtar');
-    const resultadoDiv = document.getElementById('resultado');
-    const linkCurto = document.getElementById('shortUrl');
+let segundos = 0;
+let cronometro;
 
-    if (!urlOriginal) {
-        alert("Cole uma URL válida!");
+function formatarTempo(s) {
+    const data = new Date(s * 1000);
+    return data.toLocaleTimeString('pt-BR', {
+        hour12: false,
+        timeZone: 'UTC'
+    });
+}
+
+function startTimer() {
+    const input = document.getElementById('inputMinutos');
+    const display = document.getElementById('display');
+
+    // Se o cronômetro estiver parado e houver valor no input, define os segundos
+    if (segundos === 0 && input.value > 0) {
+        segundos = parseInt(input.value) * 60;
+    }
+
+    if (segundos <= 0) {
+        alert("Manuel, digite os minutos na barra lateral!");
         return;
     }
 
-    // Feedback visual de carregamento
-    btn.innerText = "Encurtando...";
-    btn.disabled = true;
-
-    try {
-        // Chamada para a API do Cleanuri
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlOriginal)}`);
-        
-        if (response.ok) {
-            const data = await response.text(); // O TinyURL retorna apenas o texto da URL
-            
-            linkCurto.innerText = data;
-            linkCurto.href = data;
-            resultadoDiv.classList.remove('hidden');
-        } else {
-            alert("Erro ao encurtar. Tente novamente mais tarde.");
+    clearInterval(cronometro);
+    
+    cronometro = setInterval(() => {
+        if (segundos <= 0) {
+            clearInterval(cronometro);
+            display.innerHTML = "00:00:00";
+            alert("Fim do tempo!");
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        alert("Erro de conexão!");
-    } finally {
-        btn.innerText = "Encurtar Link";
-        btn.disabled = false;
-    }
+        
+        segundos--;
+        display.innerHTML = formatarTempo(segundos);
+        // Garante que a cor seja branca (pode ter herdado cinza do tailwind)
+        display.classList.add('text-white');
+    }, 1000);
 }
 
-function copiar() {
-    const text = document.getElementById('shortUrl').innerText;
-    navigator.clipboard.writeText(text);
-    alert("Link copiado para a área de transferência!");
+function pause() {
+    clearInterval(cronometro);
+}
+
+function reset() {
+    clearInterval(cronometro);
+    segundos = 0;
+    document.getElementById('display').innerHTML = "00:00:00";
+    document.getElementById('inputMinutos').value = "";
 }
